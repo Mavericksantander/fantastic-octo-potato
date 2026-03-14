@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 # fantastic-octo-potato
 =======
-# ApexVeritasOS (AVOS) MVP
+# ApexVeritasOS (AVOS) MVP 
 
 A governance platform for autonomous AI agents that provides identity, logging, and safety controls while being easy to spin up locally.
 
