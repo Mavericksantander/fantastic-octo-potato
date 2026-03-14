@@ -1,0 +1,4 @@
+.venv/
+avos.db
+__pycache__/
+

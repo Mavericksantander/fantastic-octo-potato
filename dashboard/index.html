@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ApexVeritasOS Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      background: #040d1a;
+      color: #e1e8ff;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+      background: radial-gradient(circle at top right, rgba(0, 195, 255, 0.2), transparent 40%),
+        linear-gradient(135deg, #0f172a, #020617 60%);
+    }
+
+    .dashboard {
+      width: min(1200px, 100%);
+      background: rgba(10, 25, 47, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(2, 6, 23, 0.8);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #8cf6ff;
+    }
+
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .list li {
+      padding: 0.75rem 1rem;
+      background: rgba(9, 19, 37, 0.8);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.95rem;
+    }
+
+    .muted {
+      color: #7aa6ff;
+      font-size: 0.75rem;
+    }
+
+    #status {
+      font-size: 0.75rem;
+      color: #fb7185;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+      }
+
+      .dashboard {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <div class="card">
+      <h2>Agents Overview</h2>
+      <div id="agents-status" class="muted">Loading stats…</div>
+      <div class="muted" id="active-count"></div>
+      <ul id="active-list" class="list"></ul>
+    </div>
+    <div class="card">
+      <h2>Recent Tasks</h2>
+      <div id="tasks-status" class="muted">Waiting for data…</div>
+      <ul id="tasks-list" class="list"></ul>
+    </div>
+    <div class="card">
+      <h2>Top Agents</h2>
+      <div id="top-status" class="muted">Syncing reputations…</div>
+      <ul id="top-list" class="list"></ul>
+    </div>
+    <div class="card">
+      <h2>Blocked Actions</h2>
+      <div id="blocked-status" class="muted">Watching for risky commands…</div>
+      <ul id="blocked-list" class="list"></ul>
+    </div>
+    <div class="card">
+      <h2>Misión · Visión</h2>
+      <div class="muted">Capacitar a agentes autónomos y humanos para interactuar de manera segura, confiable y responsable, ofreciendo un marco de gobernanza y reputación que permita la colaboración efectiva y la ejecución de tareas complejas sin comprometer la seguridad o la ética. Este MVP es un primer paso hacia un ecosistema donde la autonomía de los agentes pueda ser confiable desde el inicio.</div>
+      <div class="muted">Visión · Construir un sistema global de gobernanza para agentes de IA que permita a los humanos delegar tareas críticas con total confianza, fomentando la creación de redes autónomas, resilientes y colaborativas. Lo que comienza como un pequeño laboratorio de prueba para 10 bots puede evolucionar hacia un estándar de confianza para toda la economía digital y la interacción entre inteligencias artificiales.</div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
