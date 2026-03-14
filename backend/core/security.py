@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -12,10 +12,9 @@ from ..database import get_db
 from ..models import Agent
 from .config import settings
 from .logging import bind_request
-from structlog.contextvars import merge_contextvars
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-security_scheme = HTTPBearer()
+pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
+security_scheme = HTTPBearer(auto_error=False)
 
 _rate_limit_store: Dict[str, Dict[str, Any]] = defaultdict(
     lambda: {"count": 0, "reset": datetime.utcnow() + timedelta(seconds=settings.AVOS_RATE_WINDOW)}
@@ -51,7 +50,9 @@ def verify_token(token: str) -> dict[str, Any]:
 
 
 def get_current_agent(
-    credentials: HTTPAuthorizationCredentials = Security(security_scheme), db: Session = Depends(get_db)
+    request: Request,
+    credentials: HTTPAuthorizationCredentials = Security(security_scheme),
+    db: Session = Depends(get_db),
 ) -> Agent:
     if not credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing authorization token")
@@ -63,9 +64,8 @@ def get_current_agent(
     if not agent:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
     enforce_rate_limit(agent.agent_id)
-    context = merge_contextvars()
     bind_request(
-        request_id=context.get("request_id", "unknown"),
+        request_id=getattr(request.state, "request_id", "unknown"),
         agent_id=agent.agent_id,
         reputation_delta=agent.reputation_score,
     )

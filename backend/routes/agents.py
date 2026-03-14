@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import uuid4
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -40,7 +40,9 @@ class AgentInfoResponse(BaseModel):
 
 @router.post("/register_agent", response_model=RegisterAgentResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit(rate_limit_str)
-def register_agent(payload: RegisterAgentRequest, db: Session = Depends(get_db)):
+def register_agent(
+    request: Request, payload: RegisterAgentRequest, db: Session = Depends(get_db)
+):
     agent_id = str(uuid4())
     public_key_value = secrets.token_urlsafe(32)
     agent = Agent(
@@ -64,7 +66,9 @@ def register_agent(payload: RegisterAgentRequest, db: Session = Depends(get_db))
 
 @router.get("/agent/{agent_id}", response_model=AgentInfoResponse)
 @limiter.limit(rate_limit_str)
-def get_agent(agent_id: str, db: Session = Depends(get_db), _: Agent = Depends(verify_owner)):
+def get_agent(
+    request: Request, agent_id: str, db: Session = Depends(get_db), _: Agent = Depends(verify_owner)
+):
     agent = db.query(Agent).filter(Agent.agent_id == agent_id).first()
     if not agent:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
@@ -80,7 +84,9 @@ def get_agent(agent_id: str, db: Session = Depends(get_db), _: Agent = Depends(v
 
 @router.get("/agents")
 @limiter.limit(rate_limit_str)
-def list_agents(db: Session = Depends(get_db), _: Agent = Depends(get_current_agent)):
+def list_agents(
+    request: Request, db: Session = Depends(get_db), _: Agent = Depends(get_current_agent)
+):
     agents = db.query(Agent).order_by(Agent.registered_at.desc()).limit(50).all()
     return [
         {

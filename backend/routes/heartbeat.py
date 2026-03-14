@@ -2,7 +2,7 @@ from datetime import datetime
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -23,6 +23,7 @@ class HeartbeatRequest(BaseModel):
 @router.post("/agents/{agent_id}/heartbeat", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit(rate_limit_str)
 def record_heartbeat(
+    request: Request,
     agent_id: str,
     payload: HeartbeatRequest,
     db: Session = Depends(get_db),

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -26,7 +26,12 @@ class TaskLogResponse(BaseModel):
 
 @router.post("/log_task", response_model=TaskLogResponse)
 @limiter.limit(rate_limit_str)
-def log_task(payload: TaskLogRequest, db: Session = Depends(get_db), current_agent: Agent = Depends(get_current_agent)):
+def log_task(
+    request: Request,
+    payload: TaskLogRequest,
+    db: Session = Depends(get_db),
+    current_agent: Agent = Depends(get_current_agent),
+):
     if payload.agent_id != current_agent.agent_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Agent mismatch")
 
@@ -55,7 +60,12 @@ def log_task(payload: TaskLogRequest, db: Session = Depends(get_db), current_age
 
 @router.get("/tasks/recent")
 @limiter.limit(rate_limit_str)
-def recent_tasks(limit: int = 20, db: Session = Depends(get_db), current_agent: Agent = Depends(get_current_agent)):
+def recent_tasks(
+    request: Request,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_agent: Agent = Depends(get_current_agent),
+):
     tasks = (
         db.query(AgentTask)
         .filter(AgentTask.agent_id == current_agent.agent_id)

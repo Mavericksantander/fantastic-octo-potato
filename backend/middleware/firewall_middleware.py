@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fastapi.responses import JSONResponse
 from jose import JWTError
@@ -34,7 +34,14 @@ class FirewallMiddleware(BaseHTTPMiddleware):
             request._receive = self._replay_body(body)
         return await call_next(request)
 
-    def _log_decision(self, agent_id: str | None, payload: Dict[str, Any], decision: str, reason: str, severity: str) -> None:
+    def _log_decision(
+        self,
+        agent_id: Optional[str],
+        payload: Dict[str, Any],
+        decision: str,
+        reason: str,
+        severity: str,
+    ) -> None:
         with SessionLocal() as db:
             log = AuthorizationLog(
                 agent_id=agent_id or "unknown",
@@ -48,7 +55,7 @@ class FirewallMiddleware(BaseHTTPMiddleware):
             db.add(log)
             db.commit()
 
-    def _extract_agent(self, payload: Dict[str, Any], request: Request) -> str | None:
+    def _extract_agent(self, payload: Dict[str, Any], request: Request) -> Optional[str]:
         token = None
         authorization = request.headers.get("authorization")
         if authorization and authorization.lower().startswith("bearer "):

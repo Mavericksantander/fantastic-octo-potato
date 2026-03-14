@@ -1,6 +1,7 @@
 import logging
-import structlog
+from typing import Optional
 
+import structlog
 from structlog.contextvars import clear_contextvars, bind_contextvars
 
 
@@ -28,7 +29,9 @@ def reset_context() -> None:
     clear_contextvars()
 
 
-def bind_request(request_id: str, agent_id: str | None = None, reputation_delta: float | None = None) -> None:
+def bind_request(
+    request_id: str, agent_id: Optional[str] = None, reputation_delta: Optional[float] = None
+) -> None:
     context = {"request_id": request_id}
     if agent_id:
         context["agent_id"] = agent_id

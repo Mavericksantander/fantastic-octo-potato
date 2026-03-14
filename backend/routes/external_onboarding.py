@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import uuid4
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -34,6 +34,7 @@ class ExternalRegisterResponse(BaseModel):
 @router.post("/external/register_agent", response_model=ExternalRegisterResponse)
 @limiter.limit(rate_limit_str)
 def external_register_agent(
+    request: Request,
     payload: ExternalRegisterRequest,
     db: Session = Depends(get_db),
 ):

@@ -45,6 +45,7 @@ app.add_middleware(FirewallMiddleware)
 async def logging_middleware(request: Request, call_next):
     request_id = str(uuid4())
     bind_request(request_id=request_id)
+    request.state.request_id = request_id
     logger.info("request.start", method=request.method, path=str(request.url.path))
     response = await call_next(request)
     logger.info("request.end", status_code=response.status_code)
@@ -94,8 +95,9 @@ app.include_router(heartbeat_routes.router)
 app.include_router(metrics_routes.router)
 app.include_router(search_routes.router)
 
+init_db()
+
 
 @app.on_event("startup")
 def on_startup():
-    init_db()
     logging.info("AVOS database schemas initialized")

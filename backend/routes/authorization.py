@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from typing import Any, Dict, Tuple
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -29,6 +29,7 @@ class AuthorizationResponse(BaseModel):
 @router.post("/authorize_action", response_model=AuthorizationResponse)
 @limiter.limit(rate_limit_str)
 def authorize_action(
+    request: Request,
     payload: AuthorizationRequest,
     db: Session = Depends(get_db),
     current_agent: Agent = Depends(get_current_agent),
@@ -52,7 +53,12 @@ def authorize_action(
 
 @router.get("/authorization/logs")
 @limiter.limit(rate_limit_str)
-def authorization_logs(limit: int = 20, db: Session = Depends(get_db), current_agent: Agent = Depends(get_current_agent)):
+def authorization_logs(
+    request: Request,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_agent: Agent = Depends(get_current_agent),
+):
     logs = (
         db.query(AuthorizationLog)
         .filter(AuthorizationLog.agent_id == current_agent.agent_id)
@@ -73,7 +79,7 @@ def authorization_logs(limit: int = 20, db: Session = Depends(get_db), current_a
 
 @router.get("/dashboard/summary")
 @limiter.limit(rate_limit_str)
-def dashboard_summary(db: Session = Depends(get_db)):
+def dashboard_summary(request: Request, db: Session = Depends(get_db)):
     total_agents = db.query(Agent).count()
     now = datetime.utcnow()
     active_threshold = now - timedelta(minutes=5)
