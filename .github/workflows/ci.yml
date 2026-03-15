@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Migrate DB (SQLite)
+        env:
+          DATABASE_URL: sqlite:///./ci.db
+          SECRET_KEY: ci-secret-key
+          DEBUG: "false"
+        run: |
+          alembic upgrade head
+
+      - name: Run tests
+        env:
+          DATABASE_URL: sqlite:///./ci.db
+          SECRET_KEY: ci-secret-key
+          DEBUG: "false"
+        run: |
+          pytest -q --cov=backend --cov-report=term-missing --cov-fail-under=60

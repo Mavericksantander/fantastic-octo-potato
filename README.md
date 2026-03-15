@@ -2,6 +2,8 @@
 
 AVOS es una plataforma de gobernanza para agentes autónomos: identidad, autenticación JWT, logging de tareas, reputación y controles de seguridad (firewall + policies), con un dashboard HTML/JS y eventos SSE para demos.
 
+![CI](https://github.com/Mavericksantander/fantastic-octo-potato/actions/workflows/ci.yml/badge.svg)
+
 ## Qué trae este repo
 - **Backend**: FastAPI + SQLAlchemy 2.0 (`backend/`)
 - **DB**: SQLite por defecto (`avos.db`), compatible con Postgres vía `DATABASE_URL`
@@ -132,6 +134,8 @@ Los invite codes viven en `backend/routes/external_onboarding.py`.
 python3 -m pytest -q
 python3 -m pytest -q --cov=backend
 ```
+
+CI (GitHub Actions) corre tests + migraciones en cada push/PR. El umbral de coverage en CI está temporalmente en 60% mientras se agregan tests de `policies`, `a2a` y `constitution`.
 
 ## Migrations (Alembic)
 Aplicar:
